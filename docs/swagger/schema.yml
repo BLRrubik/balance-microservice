@@ -1,0 +1,317 @@
+openapi: 3.0.1
+
+info:
+  title: Balance application - Swagger 3.0
+  version: 1.0.0
+servers:
+  - url: https://localhost:9090
+tags:
+  - name: Health
+    description: Методы для проверки работоспособности
+  - name: Пользователи
+    description: Методы для работы с пользователем
+  - name: Счета
+    description: Методы для работы со счетами
+  - name: Услуги
+    description: Методы для работы с услугами
+  - name: Бухгалтерия
+    description: Методы для работы с бухгалтерией
+  - name: Транзакции
+    description: Методы для работы с транзакциями
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Get health status
+      responses:
+        '200':
+          description: A JSON with status and time
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+  /users/{userId}:
+    get:
+      tags:
+        - Пользователи
+      summary: Get balance of user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The user ID
+      responses:
+        '200':
+          description: Balance of user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/deposit:
+    post:
+      tags:
+        - Пользователи
+      summary: Deposit on balance
+      responses:
+        '200':
+          description: A JSON with user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                deposit:
+                  type: number
+
+  /accounting:
+    get:
+      tags:
+        - Бухгалтерия
+      summary: Get accounting records
+      responses:
+        '200':
+          description: A JSON array of task IDs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Accounting'
+  /accounting/csv:
+    get:
+      tags:
+        - Бухгалтерия
+      summary: Get accounting records
+      responses:
+        '200':
+          description: CSV file should be start downloading
+  /services/{serviceId}:
+    get:
+      tags:
+        - Услуги
+      summary: Get service by id
+      parameters:
+        - in: path
+          name: serviceId
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The service ID
+      responses:
+        '200':
+          description: A JSON with service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+  /bills:
+    post:
+      tags:
+        - Счета
+      summary: Резервирование средств
+      responses:
+        '200':
+          description: A JSON of bill
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                serviceId:
+                  type: integer
+                orderId:
+                  type: integer
+                price:
+                  type: number
+  /bills/{billId}/approve:
+    patch:
+      tags:
+        - Счета
+      summary: Подтвердить резервирование и зачислить деньги на счет компании
+      parameters:
+        - in: path
+          name: billId
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: ID счета
+      responses:
+        '200':
+          description: A JSON of bill
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+  /bills/{billId}/reject:
+    patch:
+      tags:
+        - Счета
+      summary: Отменить резервирование и зачислить деньги обратно пользователю
+      parameters:
+        - in: path
+          name: billId
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: ID счета
+      responses:
+        '200':
+          description: A JSON of bill
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+  /transactions:
+    get:
+      tags:
+        - Транзакции
+      summary: Получить транзакции пользователя
+      parameters:
+        - in: query
+          name: userId
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: ID пользователя
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: integer
+            default: 0
+            minimum: 1
+          description: номер страницы (0,1,...,N)
+        - in: query
+          name: size
+          required: true
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+          description: количество элементов на странице (2,3,...,N)
+        - in: query
+          name: sort
+          required: true
+          schema:
+            type: string
+            default: date
+            minimum: 1
+          description: сортировка по полю (date\price)
+        - in: query
+          name: dir
+          required: true
+          schema:
+            type: string
+            default: asc
+            minimum: 1
+          description: порядок сортировки (asc\desc)
+      responses:
+        '200':
+          description: Список транзакций пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+
+
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        balance:
+          type: integer
+    Service:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    Bill:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        service:
+          $ref: '#/components/schemas/Service'
+        orderId:
+          type: integer
+        price:
+          type: integer
+        status:
+          type: string
+          enum:
+            - PENDING
+            - REJECT
+            - APPROVE
+        moderateAt:
+          type: string
+    Accounting:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        service:
+          $ref: '#/components/schemas/Service'
+        orderId:
+          type: integer
+        price:
+          type: integer
+        createdAt:
+          type: string
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        price:
+          type: integer
+        comment:
+          type: string
+        status:
+          type: string
+          enum:
+            - PAYMENT
+            - DEPOSIT
+            - RESERVED
+        date:
+          type: string
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+        time:
+          type: string

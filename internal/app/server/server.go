@@ -10,10 +10,6 @@ import (
 	"log"
 )
 
-type ErrorType struct {
-	Message string `json:"message"`
-}
-
 type server struct {
 	router *gin.Engine
 	store  store.Store

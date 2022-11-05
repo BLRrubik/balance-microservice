@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+type ErrorType struct {
+	Message string `json:"message"`
+}
+
 func (s *server) configureRouter() {
 	//health check endpoint
 	s.router.GET("/health", s.healthCheck)
@@ -20,8 +24,8 @@ func (s *server) configureRouter() {
 
 	//bills endpoint
 	s.router.POST("/bills", s.reserveFunds)
-	s.router.PATCH("/bill/:billId/approve", s.approveReservation)
-	s.router.PATCH("/bill/:billId/reject", s.rejectReservation)
+	s.router.PATCH("/bills/:billId/approve", s.approveReservation)
+	s.router.PATCH("/bills/:billId/reject", s.rejectReservation)
 
 	//accounting
 	s.router.GET("/accounting", s.getAccounting)
@@ -31,7 +35,7 @@ func (s *server) configureRouter() {
 	s.router.GET("/transactions/:userId", s.getTransactionsOfUser)
 }
 
-// health
+// health check
 func (s *server) healthCheck(c *gin.Context) {
 	type response struct {
 		Status string `json:"status"`
