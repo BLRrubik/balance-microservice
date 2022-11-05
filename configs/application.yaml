@@ -5,7 +5,7 @@ logger:
   level: INFO
 
 database:
-  host: localhost
+  host: database
   dbname: balances_service_dev
   sslmode: disable
   user: postgres
