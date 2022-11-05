@@ -4,7 +4,7 @@ info:
   title: Balance application - Swagger 3.0
   version: 1.0.0
 servers:
-  - url: https://localhost:9090
+  - url: http://localhost:9090
 tags:
   - name: Health
     description: Методы для проверки работоспособности
@@ -23,10 +23,10 @@ paths:
     get:
       tags:
         - Health
-      summary: Get health status
+      summary: Получить статус приложения
       responses:
         '200':
-          description: A JSON with status and time
+          description: Статус приложения и время
           content:
             application/json:
               schema:
@@ -35,7 +35,7 @@ paths:
     get:
       tags:
         - Пользователи
-      summary: Get balance of user
+      summary: Получить баланс пользователя
       parameters:
         - in: path
           name: userId
@@ -43,10 +43,10 @@ paths:
           schema:
             type: integer
             minimum: 1
-          description: The user ID
+          description: ID пользователя
       responses:
         '200':
-          description: Balance of user
+          description: Баланс пользователя
           content:
             application/json:
               schema:
@@ -55,10 +55,10 @@ paths:
     post:
       tags:
         - Пользователи
-      summary: Deposit on balance
+      summary: Зачислить средства на баланс
       responses:
         '200':
-          description: A JSON with user
+          description: JSON пользователя
           content:
             application/json:
               schema:
@@ -78,10 +78,10 @@ paths:
     get:
       tags:
         - Бухгалтерия
-      summary: Get accounting records
+      summary: Получить записи бухгалтерии
       responses:
         '200':
-          description: A JSON array of task IDs
+          description: Записи бухгалтерии
           content:
             application/json:
               schema:
@@ -92,15 +92,23 @@ paths:
     get:
       tags:
         - Бухгалтерия
-      summary: Get accounting records
+      summary: Экспорт записей за месяц в csv
+      parameters:
+        - in: query
+          name: date
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: дата в формате yyyy-MM
       responses:
         '200':
-          description: CSV file should be start downloading
+          description: Загрузка CSV файла должна начаться
   /services/{serviceId}:
     get:
       tags:
         - Услуги
-      summary: Get service by id
+      summary: Получить услугу по айди
       parameters:
         - in: path
           name: serviceId
@@ -108,10 +116,10 @@ paths:
           schema:
             type: integer
             minimum: 1
-          description: The service ID
+          description: Айди услуги
       responses:
         '200':
-          description: A JSON with service
+          description: Услуга
           content:
             application/json:
               schema:
@@ -123,7 +131,7 @@ paths:
       summary: Резервирование средств
       responses:
         '200':
-          description: A JSON of bill
+          description: Счет
           content:
             application/json:
               schema:
@@ -157,7 +165,7 @@ paths:
           description: ID счета
       responses:
         '200':
-          description: A JSON of bill
+          description: Счет
           content:
             application/json:
               schema:
@@ -177,7 +185,7 @@ paths:
           description: ID счета
       responses:
         '200':
-          description: A JSON of bill
+          description: Счет
           content:
             application/json:
               schema:
