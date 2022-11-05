@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  balance-service:
+    build: ./
+    image: balance-service-dock
+    container_name: balance-service-container
+    volumes:
+      - ./files/csv/:/files/csv/
+    restart: always
+    ports:
+      - 9090:9090
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      backend:
+         aliases:
+            - "balance-service"
+
+  database:
+    restart: always
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "balances_service_dev"
+    volumes:
+      - ./database/psql/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./database/psql/data.sql:/docker-entrypoint-initdb.d/2-data.sql
+    ports:
+      - 5432:5432
+    networks:
+      backend:
+        aliases:
+          - "database"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  backend:
+    driver: bridge

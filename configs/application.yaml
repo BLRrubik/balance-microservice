@@ -1,0 +1,13 @@
+server:
+  port: 9090
+
+logger:
+  level: INFO
+
+database:
+  host: database
+  dbname: balances_service_dev
+  sslmode: disable
+  user: postgres
+  password: postgres
+  port: 5432
